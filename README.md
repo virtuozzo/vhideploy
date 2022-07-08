@@ -18,7 +18,7 @@ This script allows to deploy nested VHI cluster for test/dev automatically. Clus
 4. Upload the latest VHI qcow2 template to your cluster via Admin UI or CLI (faster):
     1. Login to your physical VHI cluster master node via SSH.
     2. Download the latest VHI qcow2 template:
-    `# wget https://virtuozzo.s3.amazonaws.com/vzlinux-iso-hci-5.1.0-206.qcow2`
+    `# wget https://virtuozzo.s3.amazonaws.com/vzlinux-iso-hci-latest.qcow2`
     3. Create an image:
     `# vinfra service compute image create vz-5.1.0-206 --disk-format qcow2 --container-format bare --file vzlinux-iso-hci-5.1.0-206.qcow2 --public --wait`
 
