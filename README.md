@@ -14,7 +14,7 @@ This script allows to deploy nested VHI cluster for test/dev automatically. Clus
         1. For the host: `# cat /sys/module/kvm_intel/parameters/nested`
         2. For VM, run inside VM: `# cat /proc/cpuinfo | grep vmx`
 2. Cluster must have a public and private networks configured. Private network should not have a default gateway.
-3. Cluster must have a flavor “xxlarge” with at least 8 vCPU and 24GB RAM. Nested VHI uses the flavor “xxlarge” by default.
+3. Cluster must have flavors “vhimaster” and "vhislave" with at least 8 vCPU and 24GB RAM. We use these flavors by default.
 4. Upload the latest VHI qcow2 template to your cluster via Admin UI or CLI (faster):
     1. Login to your physical VHI cluster master node via SSH.
     2. Download the latest VHI qcow2 template:
@@ -62,7 +62,8 @@ This script allows to deploy nested VHI cluster for test/dev automatically. Clus
     - public_network - the name of the public (physical) network, this network must have DHCP enabled and DNS configured, default name - “public”;
     - slave_count - number of cluster nodes in addition to management nodes; for HA configuration, the minimal slave count must be 2;
     - stack_type - VHI deployment mode: compute - cluster with storage and compute roles; hacompute - cluster with storage and compute roles, management nodes with HA.
-    - flavor - flavor to use for VHI nodes.
+    - master_flavor - flavor to use for VHI master nodes.
+    - slave_flavor - flavor to use for VHI slave nodes.
     - compute_addons - what addons should be automatically installed after cluster deployment.
 4. Check stack status: `# openstack --insecure stack lis`
 5. Wait at least for 10 minutes for cluster to be deployed. After that go to the master node public IP in your browser https://<master_ip>:8888 with provided password. Check the compute cluster and other services status.
