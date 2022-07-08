@@ -1,0 +1,213 @@
+heat_template_version: 2016-10-14
+description: >
+    Template to deploy a VHI cluster
+
+parameters:
+
+  stack_type:
+    default: storage
+    type: string
+    constraints:
+      - allowed_values: [none, storage, compute, ha, hacompute]
+
+  compute_addons:
+    default: ''
+    description: A comma-separated list of compute addons to deploy, e.g. 'k8saas,lbaas'
+    type: string
+
+  cluster_name:
+    type: string
+    label: name of storage cluster
+    description: Name of storage cluster
+    default: nestedhci
+    constraints:
+      - length: { min: 3, max: 50 }
+        description: Must be in range from 3 to 50
+
+  cluster_password:
+    type: string
+    label: VHI admin password
+    description: Name of the image to be used for the compute instance
+    default: Virtuozzo1
+
+  slave_count:
+    type: number
+    label: Slave Count
+    description: Number of slaves
+    default: 4
+
+  image:
+    type: string
+    label: Image Name
+    description: Name of the image to be used for the compute instance
+
+  master_flavor:
+    type: string
+    label: Master Flavor Name
+    description: Name of the flavor to be used for the compute instance
+    default: vhimaster
+
+  slave_flavor:
+    type: string
+    label: Slave Flavor Name
+    description: Name of the flavor to be used for the compute instance
+    default: vhislave
+
+  private_network:
+    type: string
+    label: Private network name or ID
+    description: Network to attach instance to.
+
+  public_network:
+    type: string
+    label: Private network name or ID
+    description: Network to attach instance to.
+    default: public
+
+  key_name:
+    type: string
+    description: Name of SSH key to inject into created VMs
+    default: ''
+
+  aux_repo:
+    type: string
+    description: Name of the AUX testing repository which will be used for product updates
+    default: hci-5.1.0-vz
+
+  storage_policy:
+    type: string
+    description: Storage policy used for VM's volumes. Replicas SP is 'default', erasure coding one - 'default-ec'
+    default: default
+
+resources:
+
+  vip_public:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_param: public_network }
+
+  port_public:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_param: public_network }
+
+  vip_private:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_param: private_network }
+      port_security_enabled: off
+
+  port_private:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_param: private_network }
+      port_security_enabled: off
+
+  node_name_prefix:
+    type: OS::Heat::Value
+    properties:
+      value:
+        list_join: ['-', { str_split: ['.', { get_param: 'OS::stack_name' }]}]
+
+
+  master:
+    type: OS::Nova::Server
+    properties:
+      name:
+        list_join:
+          - '-'
+          - [{ get_attr: [node_name_prefix, value] }, 'master']
+      flavor: { get_param: master_flavor }
+      config_drive: true
+      block_device_mapping_v2:
+        - boot_index: 0
+          image: { get_param: image }
+          volume_size: 250
+          volume_type: { get_param: storage_policy }
+          delete_on_termination: true
+        - boot_index: 1
+          volume_id: { get_resource: volume_01 }
+          delete_on_termination: true
+        - boot_index: 2
+          volume_id: { get_resource: volume_02 }
+          delete_on_termination: true
+      networks:
+        - port: { get_resource: port_public }
+        - port: { get_resource: port_private }
+      key_name: { get_param: key_name }
+      user_data:
+        str_replace:
+          template: {get_file: master.sh}
+          params:
+            $cluster_name: { get_param: cluster_name }
+            $password: { get_param: cluster_password }
+            $mn_ip: { get_attr: [port_public, fixed_ips, 0, ip_address] }
+            $private_ip: { get_attr: [port_private, fixed_ips, 0, ip_address] }
+            $type: { get_param: stack_type }
+            $compute_addons: { get_param: compute_addons }
+            $vip_public: { get_attr: [vip_public, fixed_ips, 0, ip_address] }
+            $vip_private: { get_attr: [vip_private, fixed_ips, 0, ip_address] }
+            $aux_repo: { get_param: aux_repo }
+
+
+  volume_01:
+    type: OS::Cinder::Volume
+    properties:
+      size: 500
+      volume_type: { get_param: storage_policy }
+
+  volume_02:
+    type: OS::Cinder::Volume
+    properties:
+      size: 500
+      volume_type: { get_param: storage_policy }
+
+  slaveresources:
+      type: OS::Heat::ResourceGroup
+      depends_on: master
+      properties:
+        count: { get_param: slave_count }
+        resource_def:
+          type: ve.yaml
+          properties:
+            name:
+              list_join:
+                - '-'
+                - [{ get_attr: [node_name_prefix, value] }, 've%index%']
+            image: { get_param: image}
+            cluster_password: { get_param: cluster_password}
+            flavor: { get_param: slave_flavor }
+            private_network: { get_param: private_network }
+            public_network: { get_param: public_network }
+            mn_ip: { get_attr: [port_private, fixed_ips, 0, ip_address] }
+            stack_type: { get_param: stack_type }
+            key_name: { get_param: key_name }
+            aux_repo: { get_param: aux_repo }
+            storage_policy: { get_param: storage_policy }
+
+outputs:
+
+  private_ip:
+    description: private IP address of the first node
+    value:
+      get_attr: [port_private, fixed_ips, 0, ip_address]
+
+  public_ip:
+    description: public IP address of the first node
+    value:
+      get_attr: [port_public, fixed_ips, 0, ip_address]
+
+  public_virtual_ip:
+    description: public Virtual IP address of the cluster if HA enabled
+    value:
+      get_attr: [vip_public, fixed_ips, 0, ip_address]
+
+  cluster_name:
+    description: name of storage cluster
+    value:
+      get_param: cluster_name
+
+  cluster_password:
+    description: admin password of VIP
+    value:
+      get_param: cluster_password

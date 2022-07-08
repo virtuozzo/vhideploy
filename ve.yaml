@@ -1,0 +1,110 @@
+heat_template_version: 2013-05-23
+description: >
+    Template to deploy a VHI cluster
+
+parameters:
+
+  name:
+    type: string
+
+  stack_type:
+    type: string
+
+  cluster_password:
+    type: string
+
+  image:
+    type: string
+
+  flavor:
+    type: string
+
+  private_network:
+    type: string
+
+  public_network:
+    type: string
+
+  mn_ip:
+    type: string
+
+  key_name:
+    type: string
+
+  aux_repo:
+    type: string
+
+  testing_infrastructure:
+    type: boolean
+
+  storage_policy:
+    type: string
+
+resources:
+
+  port_public:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_param: public_network }
+
+  port_private:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_param: private_network }
+      port_security_enabled: off
+
+  server:
+    type: OS::Nova::Server
+    properties:
+      name: { get_param: name }
+      flavor: { get_param: flavor }
+      config_drive: true
+      block_device_mapping_v2:
+        - boot_index: 0
+          image: { get_param: image }
+          volume_size: 250
+          volume_type: { get_param: storage_policy }
+          delete_on_termination: true
+        - boot_index: 1
+          volume_id: { get_resource: volume_01 }
+          delete_on_termination: true
+        - boot_index: 2
+          volume_id: { get_resource: volume_02 }
+          delete_on_termination: true
+      networks:
+        - port: { get_resource: port_public }
+        - port: { get_resource: port_private }
+      key_name: { get_param: key_name }
+      user_data:
+        str_replace:
+          template: {get_file: slave.sh}
+          params:
+              $mn_ip: { get_param: mn_ip }
+              $password: { get_param: cluster_password }
+              $public_ip: { get_attr: [port_public, fixed_ips, 0, ip_address] }
+              $private_ip: { get_attr: [port_private, fixed_ips, 0, ip_address] }
+              $type: { get_param: stack_type }
+              $aux_repo: { get_param: aux_repo }
+
+  volume_01:
+    type: OS::Cinder::Volume
+    properties:
+      size: 500
+      volume_type: { get_param: storage_policy }
+
+  volume_02:
+    type: OS::Cinder::Volume
+    properties:
+      size: 500
+      volume_type: { get_param: storage_policy }
+
+outputs:
+  private_ip:
+    description: private ip of slave VM
+    value:
+      get_attr: [port_private, fixed_ips, 0, ip_address]
+
+  public_ip:
+    description: public ip of slave VM
+    value:
+      get_attr: [port_public, fixed_ips, 0, ip_address]
