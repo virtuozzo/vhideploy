@@ -57,7 +57,7 @@ This script allows to deploy nested VHI cluster for test/dev automatically. Clus
     ```
     Here:
     - stack_name - just an OpenStack Heat stack name;
-    - image - the name of the source image, image must be qcow2 and can be downloaded from https://builds.builder.corp.acronis.com/ ;
+    - image - the name of the source image, image must be qcow2;
     - private_network - the name of the private (virtual) network, virtual network must be connected with public network via virtual router with SNAT;
     - public_network - the name of the public (physical) network, this network must have DHCP enabled and DNS configured, default name - “public”;
     - slave_count - number of cluster nodes in addition to management nodes; for HA configuration, the minimal slave count must be 2;
