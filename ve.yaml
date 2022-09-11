@@ -34,9 +34,6 @@ parameters:
   aux_repo:
     type: string
 
-  testing_infrastructure:
-    type: boolean
-
   storage_policy:
     type: string
 
