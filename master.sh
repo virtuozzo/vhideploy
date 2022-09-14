@@ -156,6 +156,8 @@ ha_nodes=$(echo $compute_nodes | cut -d ',' -f 1,2,3)
 
 log_msg "the list of nodes: $compute_nodes"
 log_msg "the list of HA nodes: $ha_nodes"
+retry vinfra --vinfra-password $password cluster settings dns set --nameservers 8.8.8.8
+sleep 2
 
 case $type in
      storage)
