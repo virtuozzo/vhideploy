@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -euo pipefail
+
 log_msg() {
     message=$1
     echo "[DEBUG] $(date +'%Y-%m-%d %H:%M:%S,%3N') ${message}" >> "/tmp/deploy.log"
