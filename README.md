@@ -1,4 +1,4 @@
-# Automated VHI Deployment
+# Nested VHI Deployment
 
 This script allows to deploy nested VHI cluster for test/dev automatically. Cluster can be deployed on top of any VHI cluster with nested virtualization enabled.
 
