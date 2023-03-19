@@ -1,6 +1,6 @@
-# Nested VHI Deployment
+# Nested Virtuozzo Hybrid Infrastructure Deployment
 
-This script allows to deploy nested VHI cluster for test/dev automatically. Cluster can be deployed on top of any VHI cluster with nested virtualization enabled.
+This script allows to deploy nested Virtuozzo Hybrid Infrastructure cluster (VHI) for test/dev automatically. Cluster can be deployed on top of any VHI cluster with nested virtualization enabled.
 
 ## Step 1. Prepare the physical VHI cluster
 1. Cluster must have a nested virtualization enabled:
