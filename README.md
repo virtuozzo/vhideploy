@@ -20,7 +20,7 @@ This script allows to deploy nested Virtuozzo Hybrid Infrastructure cluster (VHI
     2. Download the latest VHI qcow2 template:
     `# wget https://virtuozzo.s3.amazonaws.com/vzlinux-iso-hci-latest.qcow2`
     3. Create an image:
-    `# vinfra service compute image create vz-5.1.0-206 --disk-format qcow2 --container-format bare --file vzlinux-iso-hci-5.1.0-206.qcow2 --public --wait`
+    `# vinfra service compute image create vhi-latest --disk-format qcow2 --container-format bare --file vzlinux-iso-hci-latest.qcow2 --public --wait`
 
 ## Step 2. Connect to OpenStack CLI remotly
 1. Install OpenStack CLI on your computer https://docs.openstack.org/newton/user-guide/common/cli-install-openstack-command-line-clients.html For example, for MacOS: `# brew install openstackclient`
@@ -49,11 +49,11 @@ This script allows to deploy nested Virtuozzo Hybrid Infrastructure cluster (VHI
 2. Connect to OpenStack CLI remotly.
 3. Deploy heat stack:
     ```
-    # openstack --insecure stack create stack_name -t vip.yaml --parameter image="vz-5.1.0-206" --parameter stack_type="hacompute" --parameter private_network="private" --parameter slave_count="2" --parameter compute_addons="k8saas,lbaas" --parameter cluster_password="Virtuozzo1"
+    # openstack --insecure stack create stack_name -t vip.yaml --parameter image="vhi-latest" --parameter stack_type="hacompute" --parameter private_network="private" --parameter slave_count="2" --parameter compute_addons="k8saas,lbaas" --parameter cluster_password="Virtuozzo1"
     ```
     The minimal required configuration:
     ```
-    # openstack --insecure stack create stack_name -t vip.yaml --parameter image="vz-5.1.0-206" --parameter stack_type="compute" --parameter private_network="private" --parameter slave_count="2" --parameter cluster_password="Virtuozzo1"
+    # openstack --insecure stack create stack_name -t vip.yaml --parameter image="vhi-latest" --parameter stack_type="compute" --parameter private_network="private" --parameter slave_count="2" --parameter cluster_password="Virtuozzo1"
     ```
     Here:
     - stack_name - just an OpenStack Heat stack name;
