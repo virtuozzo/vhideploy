@@ -14,7 +14,7 @@ This script allows to deploy nested Virtuozzo Hybrid Infrastructure cluster (VHI
         1. For the host: `# cat /sys/module/kvm_intel/parameters/nested`
         2. For VM, run inside VM: `# cat /proc/cpuinfo | grep vmx`
 2. Cluster must have a public and private networks configured. Private network should not have a default gateway.
-3. Cluster must have flavors “vhimaster” and "vhislave" with at least 8 vCPU and 24GB RAM. We use these flavors by default.
+3. Cluster must have flavors “vhimaster” (16 vCPU, 42GB RAM) and "vhislave" (16 vCPU, 32GB RAM) with at least 8 vCPU and 24GB RAM. We use these flavors by default.
 4. Upload the latest VHI qcow2 template to your cluster via Admin UI or CLI (faster):
     1. Login to your physical VHI cluster master node via SSH.
     2. Download the latest VHI qcow2 template:
