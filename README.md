@@ -64,6 +64,7 @@ This script allows to deploy nested Virtuozzo Hybrid Infrastructure cluster (VHI
     - stack_type - VHI deployment mode: compute - cluster with storage and compute roles; hacompute - cluster with storage and compute roles, management nodes with HA.
     - master_flavor - flavor to use for VHI master nodes.
     - slave_flavor - flavor to use for VHI slave nodes.
+    - storage_policy - storage policy name.
     - compute_addons - what addons should be automatically installed after cluster deployment.
 4. Check stack status: `# openstack --insecure stack list`
 5. Wait at least for 10 minutes for cluster to be deployed. After that go to the master node public IP in your browser https://<master_ip>:8888 with provided password. Check the compute cluster and other services status.
