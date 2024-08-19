@@ -83,5 +83,5 @@ This script allows to deploy nested Virtuozzo Hybrid Infrastructure cluster (VHI
 7. Enjoy.
 
 ## Next steps
-1. Connect to OpenStack CLI:  https://docs.virtuozzo.com/virtuozzo_hybrid_infrastructure_5_1_admins_guide/index.html#connecting-to-openstack-command-line-interface.html?Highlight=openstack
-2. Configure OpenStack endpoint if needed: https://docs.virtuozzo.com/virtuozzo_hybrid_infrastructure_5_1_admins_guide/index.html#setting-dns-name-for-the-compute-api.html
+1. Connect to OpenStack CLI: https://docs.virtuozzo.com/virtuozzo_hybrid_infrastructure_6_2_admins_guide/index.html#connecting-to-openstack-command-line-interface.html
+2. Configure OpenStack endpoint if needed: https://docs.virtuozzo.com/virtuozzo_hybrid_infrastructure_6_2_admins_guide/index.html#setting-dns-name-for-the-compute-api.html
