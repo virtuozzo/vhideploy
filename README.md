@@ -5,14 +5,18 @@ This script allows to deploy nested Virtuozzo Hybrid Infrastructure cluster (VHI
 ## Step 1. Prepare the physical VHI cluster
 1. Cluster must have a nested virtualization enabled:
     1. Enable nested virtualization for the physical host:
-        1. connect to your physical VHI node via SSH.
-        2. open a file: 
-        `# vi /etc/modprobe.d/dist.conf`
-        4. add a new line: `options kvm-intel nested=y`
-        5. reboot the host
-    2. VMs should be created only after that. To check if nested is enabled:
-        1. For the host: `# cat /sys/module/kvm_intel/parameters/nested`
-        2. For VM, run inside VM: `# cat /proc/cpuinfo | grep vmx`
+        1. Connect to your physical VHI node via SSH.
+        2. Open the `/etc/modprobe.d/dist.conf` file.
+        3. Add the following line:
+            - [For Intel-based systems] Add this line: `options kvm_intel nested=y`
+            - [For AMD-based systems] Add this line: `options kvm_amd nested=y`
+        4. [For AMD-based systems only] Add the `svm` flag to your CPU model. For example: `# vinfra service compute set --cpu-model EPYC-IBPB --cpu-features svm`
+        5. Reboot the host.
+    2. VMs should be created only after that. To check if nested virtualization is enabled:
+        - For a physical server:
+            - [For Intel-based systems] Run this command on the node: `# cat /sys/module/kvm_intel/parameters/nested`
+            - [For AMD-based systems] Run this command on the node: `# cat /sys/module/kvm_amd/parameters/nested`
+        - For a virtual machine, run this command inside the VM: `# cat /proc/cpuinfo | grep vmx`
 2. Cluster must have a public and private networks configured. Private network should not have a default gateway.
 3. Cluster must have flavors “vhimaster” (16 vCPU, 42GB RAM) and "vhislave" (16 vCPU, 32GB RAM) with at least 8 vCPU and 24GB RAM. We use these flavors by default.
 4. Upload the latest VHI qcow2 template to your cluster via Admin UI or CLI (faster):
